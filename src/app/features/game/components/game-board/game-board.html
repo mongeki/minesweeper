@@ -1,0 +1,26 @@
+<div class="board" [style.gridTemplateColumns]="'repeat(' + game.state().cols + ', 1fr)'">
+  @for (row of game.state().board; track $index) {
+    @for (cell of row; track cell.row + '-' + cell.col) {
+      <div
+        class="cell"
+        [ngClass]="{
+          open: cell.isOpen,
+          mine: cell.isOpen && cell.isMine,
+          flagged: cell.isFlagged,
+        }"
+        (click)="onLeftClick(cell.row, cell.col)"
+        (contextmenu)="onRightClick($event, cell.row, cell.col)"
+      >
+        @if (cell.isOpen && !cell.isMine && cell.adjacentMines > 0) {
+          <span>{{ cell.adjacentMines }}</span>
+        }
+        @if (cell.isOpen && cell.isMine) {
+          <span>💣</span>
+        }
+        @if (!cell.isOpen && cell.isFlagged) {
+          <span>🚩</span>
+        }
+      </div>
+    }
+  }
+</div>

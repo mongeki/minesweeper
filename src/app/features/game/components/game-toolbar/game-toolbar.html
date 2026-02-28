@@ -1,0 +1,10 @@
+<mat-toolbar class="game-toolbar">
+  <div class="counter">💣 {{ game.minesLeft() }}</div>
+
+  <button mat-raised-button color="primary" (click)="game.newGame()">
+    <mat-icon>refresh</mat-icon>
+    New Game
+  </button>
+
+  <div class="counter">⏱ {{ game.time() }}s</div>
+</mat-toolbar>

@@ -1,0 +1,17 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="menuClick.emit()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="app-title">Minesweeper</span>
+
+  <span class="spacer"></span>
+  <button mat-icon-button (click)="themeService.toggleTheme()">
+    <mat-icon>
+      {{ themeService.theme() === 'light-theme' ? 'dark_mode' : 'light_mode' }}
+    </mat-icon>
+  </button>
+  <button mat-icon-button>
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>

@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>
+  {{ isWin ? '🎉 You Won!' : '💥 Game Over' }}
+</h2>
+
+<div mat-dialog-content>
+  <p>
+    {{ isWin ? 'Congratulations!' : 'You hit a mine.' }}
+  </p>
+
+  <p>
+    ⏱ Time: <strong>{{ data.time }} seconds</strong>
+  </p>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" mat-dialog-close="restart">Play Again</button>
+
+  <button mat-button mat-dialog-close>Close</button>
+</div>
