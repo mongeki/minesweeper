@@ -4,10 +4,27 @@
 
 mat-sidenav {
   width: 240px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+
+  :host-context(body.dark-theme) & {
+    border-right-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+mat-sidenav-content {
+  display: flex;
+  flex-direction: column;
+  background-color: #fafafa;
+
+  :host-context(body.dark-theme) & {
+    background-color: #303030;
+  }
 }
 
 .content {
   padding: 24px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 @media (max-width: 600px) {

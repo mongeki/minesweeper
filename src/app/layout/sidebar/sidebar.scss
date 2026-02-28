@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  height: 100%;
+  background-color: #f5f5f5;
+
+  :host-context(body.dark-theme) & {
+    background-color: #424242;
+  }
+}
+
+mat-nav-list {
+  padding-top: 8px;
+}
+
+a[mat-list-item] {
+  &.active {
+    background-color: rgba(0, 0, 0, 0.08);
+
+    :host-context(body.dark-theme) & {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    mat-icon {
+      color: #007aff;
+
+      :host-context(body.dark-theme) & {
+        color: #bb86fc;
+      }
+    }
+  }
+
+  mat-icon {
+    margin-right: 16px;
+  }
+}
+
+.mat-divider {
+  margin: 8px 0;
+}
