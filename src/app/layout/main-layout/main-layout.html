@@ -9,7 +9,7 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <app-header (menuClick)="toggle()"></app-header>
+    <app-header (menuClick)="toggle()" [showMenuToggler]="isMobile()"></app-header>
 
     <div class="content">
       <router-outlet></router-outlet>

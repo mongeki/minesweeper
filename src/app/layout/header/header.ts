@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output, signal } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,5 +12,6 @@ import { ThemeService } from '../../core/theme/theme.service';
 })
 export class Header {
   @Output() menuClick = new EventEmitter<void>();
+  showMenuToggler = input(true);
   constructor(public themeService: ThemeService) {}
 }

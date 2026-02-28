@@ -1,8 +1,9 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button (click)="menuClick.emit()">
-    <mat-icon>menu</mat-icon>
-  </button>
-
+  @if (showMenuToggler()) {
+    <button mat-icon-button (click)="menuClick.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
   <span class="app-title">Minesweeper</span>
 
   <span class="spacer"></span>
