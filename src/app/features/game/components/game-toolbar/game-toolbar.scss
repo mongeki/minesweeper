@@ -1,7 +1,12 @@
 .game-toolbar {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   border-radius: 12px;
+}
+
+.difficulty-select {
+  width: 160px;
 }
 
 .counter {

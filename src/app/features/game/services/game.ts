@@ -2,23 +2,24 @@ import { Injectable, signal, computed, effect } from '@angular/core';
 import { GameEngine } from '../../../domain/utils/game-engine';
 import { GameState } from '../../../domain/models/game-state.model';
 import { GameStatus } from '../../../domain/enums/game-status.enum';
+import { Difficulty } from '../../../domain/enums/difficulty.enum';
+import { DIFFICULTY_CONFIG } from '../../../domain/utils/difficulty.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService {
-  private initialRows = 9;
-  private initialCols = 9;
-  private initialMines = 10;
-
-  private _state = signal<GameState>(
-    GameEngine.createGame(this.initialRows, this.initialCols, this.initialMines),
-  );
+  difficulty = signal<Difficulty>(Difficulty.Beginner);
+  private _state = signal<GameState>(this.createInitialGame());
 
   state = this._state.asReadonly();
   status = computed(() => this._state().status);
 
-  // 🔥 ТАЙМЕР
+  private createInitialGame(): GameState {
+    const config = DIFFICULTY_CONFIG[this.difficulty()];
+    return GameEngine.createGame(config.rows, config.cols, config.mines);
+  }
+
   private _time = signal(0);
   time = this._time.asReadonly();
 
@@ -48,7 +49,13 @@ export class GameService {
     this.stopTimer();
     this._time.set(0);
 
-    this._state.set(GameEngine.createGame(this.initialRows, this.initialCols, this.initialMines));
+    const config = DIFFICULTY_CONFIG[this.difficulty()];
+    this._state.set(GameEngine.createGame(config.rows, config.cols, config.mines));
+  }
+
+  setDifficulty(difficulty: Difficulty) {
+    this.difficulty.set(difficulty);
+    this.newGame();
   }
 
   open(row: number, col: number) {
@@ -60,10 +67,6 @@ export class GameService {
     const updated = GameEngine.toggleFlag(this._state(), row, col);
     this._state.set({ ...updated });
   }
-
-  // -----------------------
-  // TIMER METHODS
-  // -----------------------
 
   private startTimer() {
     this.intervalId = setInterval(() => {

@@ -1,9 +1,16 @@
 <mat-toolbar class="game-toolbar">
   <div class="counter">💣 {{ game.minesLeft() }}</div>
 
+  <mat-form-field appearance="outline" class="difficulty-select">
+    <mat-select [value]="game.difficulty()" (valueChange)="game.setDifficulty($event)">
+      <mat-option [value]="Difficulty.Beginner">Beginner</mat-option>
+      <mat-option [value]="Difficulty.Intermediate">Intermediate</mat-option>
+      <mat-option [value]="Difficulty.Expert">Expert</mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <button mat-raised-button color="primary" (click)="game.newGame()">
     <mat-icon>refresh</mat-icon>
-    New Game
   </button>
 
   <div class="counter">⏱ {{ game.time() }}s</div>
