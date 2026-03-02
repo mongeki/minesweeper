@@ -16,7 +16,9 @@
           (contextmenu)="onRightClick($event, cell.row, cell.col)"
         >
           @if (cell.isOpen && !cell.isMine && cell.adjacentMines > 0) {
-            <span>{{ cell.adjacentMines }}</span>
+            <span [ngClass]="'mine-' + cell.adjacentMines">
+              {{ cell.adjacentMines }}
+            </span>
           }
           @if (cell.isOpen && cell.isMine) {
             <span>💣</span>

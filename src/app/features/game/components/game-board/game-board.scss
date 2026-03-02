@@ -9,13 +9,12 @@
 }
 
 .board {
-  --cell-size: 30px; // Фиксированный размер ячейки
+  --cell-size: 30px;
 
   display: grid;
   gap: 4px;
   background: transparent;
 
-  // Для очень больших досок - уменьшаем ячейки
   @media (max-width: 768px) {
     --cell-size: 35px;
   }
@@ -37,7 +36,7 @@
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  font-size: calc(var(--cell-size) * 0.5); // Адаптивный размер шрифта
+  font-size: calc(var(--cell-size) * 0.5);
   transition: 0.2s;
   user-select: none;
   box-sizing: border-box;
@@ -48,8 +47,52 @@
 
   &.open {
     background: var(--mat-sys-surface-container-high, #e3f2fd);
-    color: var(--mat-sys-on-surface, #000000);
     cursor: default;
+
+    // Стили для цифр в открытых ячейках
+    span {
+      font-weight: bold;
+
+      // 1 - Синий
+      &.mine-1 {
+        color: var(--mat-sys-primary, #1976d2);
+      }
+
+      // 2 - Зеленый
+      &.mine-2 {
+        color: var(--mat-sys-green, #388e3c);
+      }
+
+      // 3 - Красный
+      &.mine-3 {
+        color: var(--mat-sys-error, #d32f2f);
+      }
+
+      // 4 - Темно-синий
+      &.mine-4 {
+        color: var(--mat-sys-primary-fixed, #0d47a1);
+      }
+
+      // 5 - Коричневый
+      &.mine-5 {
+        color: var(--mat-sys-tertiary-fixed, #8b5a2b);
+      }
+
+      // 6 - Бирюзовый
+      &.mine-6 {
+        color: #00897b; // Material Teal 600
+      }
+
+      // 7 - Черный
+      &.mine-7 {
+        color: var(--mat-sys-on-surface, #000000);
+      }
+
+      // 8 - Серый (для запаса)
+      &.mine-8 {
+        color: var(--mat-sys-outline, #757575);
+      }
+    }
   }
 
   &.mine {
@@ -63,7 +106,46 @@
   }
 }
 
-// Альтернативный вариант с динамическим размером
+// Альтернативный вариант с использованием Material палитры через системные переменные
+.cell-theme-aware {
+  &.open span {
+    // 1 - Primary
+    &.mine-1 {
+      color: var(--mat-sys-primary);
+    }
+
+    // 2 - Green (используем tertiary как зеленый)
+    &.mine-2 {
+      color: var(--mat-sys-tertiary);
+    }
+
+    // 3 - Error
+    &.mine-3 {
+      color: var(--mat-sys-error);
+    }
+
+    // 4 - Primary с оттенком
+    &.mine-4 {
+      color: var(--mat-sys-primary-fixed);
+    }
+
+    // 5 - Tertiary с оттенком
+    &.mine-5 {
+      color: var(--mat-sys-tertiary-fixed);
+    }
+
+    // 6 - Для бирюзового используем secondary
+    &.mine-6 {
+      color: var(--mat-sys-secondary);
+    }
+
+    // 7 - On surface (черный/белый в зависимости от темы)
+    &.mine-7 {
+      color: var(--mat-sys-on-surface);
+    }
+  }
+}
+
 .board.dynamic-size {
   --min-cell-size: 30px;
   --max-cell-size: 50px;
