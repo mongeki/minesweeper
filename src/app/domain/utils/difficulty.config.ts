@@ -16,8 +16,8 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
   },
   [Difficulty.Expert]: {
     difficulty: Difficulty.Expert,
-    rows: 16,
-    cols: 30,
+    rows: 18,
+    cols: 22,
     mines: 99,
   },
 };

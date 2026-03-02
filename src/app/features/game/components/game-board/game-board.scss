@@ -1,10 +1,34 @@
+.board-container {
+  width: 100%;
+  max-width: 100vw;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
 .board {
+  --cell-size: 30px; // Фиксированный размер ячейки
+
   display: grid;
   gap: 4px;
-  aspect-ratio: 1;
+  background: transparent;
+
+  // Для очень больших досок - уменьшаем ячейки
+  @media (max-width: 768px) {
+    --cell-size: 35px;
+  }
+
+  @media (max-width: 480px) {
+    --cell-size: 30px;
+  }
 }
 
 .cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+
   background: #90caf9;
   border-radius: 6px;
   cursor: pointer;
@@ -12,8 +36,10 @@
   justify-content: center;
   align-items: center;
   font-weight: bold;
+  font-size: calc(var(--cell-size) * 0.5); // Адаптивный размер шрифта
   transition: 0.2s;
   user-select: none;
+  box-sizing: border-box;
 
   &:hover {
     background: #64b5f6;
@@ -32,4 +58,15 @@
   &.flagged {
     background: #ffca28;
   }
+}
+
+// Альтернативный вариант с динамическим размером
+.board.dynamic-size {
+  --min-cell-size: 30px;
+  --max-cell-size: 50px;
+  --available-width: min(80vw, 800px);
+  --cell-size: min(
+    max(var(--min-cell-size), calc(var(--available-width) / var(--cols))),
+    var(--max-cell-size)
+  );
 }
