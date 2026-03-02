@@ -29,7 +29,8 @@
   width: var(--cell-size);
   height: var(--cell-size);
 
-  background: #90caf9;
+  background: var(--mat-sys-primary-container, #90caf9);
+  color: var(--mat-sys-on-primary-container, #000000);
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -42,21 +43,23 @@
   box-sizing: border-box;
 
   &:hover {
-    background: #64b5f6;
+    background: var(--mat-sys-primary-fixed-dim, #64b5f6);
   }
 
   &.open {
-    background: #e3f2fd;
+    background: var(--mat-sys-surface-container-high, #e3f2fd);
+    color: var(--mat-sys-on-surface, #000000);
     cursor: default;
   }
 
   &.mine {
-    background: #ef5350;
-    color: white;
+    background: var(--mat-sys-error-container, #ef5350);
+    color: var(--mat-sys-on-error-container, #ffffff);
   }
 
   &.flagged {
-    background: #ffca28;
+    background: var(--mat-sys-tertiary-container, #ffca28);
+    color: var(--mat-sys-on-tertiary-container, #000000);
   }
 }
 
