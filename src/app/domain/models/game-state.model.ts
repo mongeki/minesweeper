@@ -8,4 +8,5 @@ export interface GameState {
   board: Cell[][];
   status: GameStatus;
   openedCount: number;
+  seed: number;
 }

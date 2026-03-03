@@ -46,11 +46,12 @@ export class GameService {
   });
 
   newGame() {
-    this.stopTimer();
-    this._time.set(0);
-
     const config = DIFFICULTY_CONFIG[this.difficulty()];
-    this._state.set(GameEngine.createGame(config.rows, config.cols, config.mines));
+    const seed = Date.now();
+
+    this._state.set(GameEngine.createGame(config.rows, config.cols, config.mines, seed));
+
+    this._time.set(0);
   }
 
   setDifficulty(difficulty: Difficulty) {

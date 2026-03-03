@@ -3,7 +3,12 @@ import { GameState } from '../models/game-state.model';
 import { GameStatus } from '../enums/game-status.enum';
 
 export class GameEngine {
-  static createGame(rows: number, cols: number, mines: number): GameState {
+  static createGame(
+    rows: number,
+    cols: number,
+    mines: number,
+    seed: number = Date.now(),
+  ): GameState {
     const board = this.createEmptyBoard(rows, cols);
 
     return {
@@ -13,6 +18,7 @@ export class GameEngine {
       board,
       status: GameStatus.Ready,
       openedCount: 0,
+      seed,
     };
   }
 
@@ -64,6 +70,15 @@ export class GameEngine {
   // PRIVATE METHODS
   // ------------------------
 
+  private static mulberry32(seed: number) {
+    return function () {
+      let t = (seed += 0x6d2b79f5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   private static createEmptyBoard(rows: number, cols: number): Cell[][] {
     const board: Cell[][] = [];
 
@@ -86,12 +101,12 @@ export class GameEngine {
   }
 
   private static placeMines(state: GameState, safeRow: number, safeCol: number) {
+    const random = this.mulberry32(state.seed);
+
     const forbidden = new Set<string>();
 
-    // запрещаем саму клетку
     forbidden.add(`${safeRow}-${safeCol}`);
 
-    // запрещаем соседей
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         const r = safeRow + dr;
@@ -105,8 +120,8 @@ export class GameEngine {
     let placed = 0;
 
     while (placed < state.mines) {
-      const r = Math.floor(Math.random() * state.rows);
-      const c = Math.floor(Math.random() * state.cols);
+      const r = Math.floor(random() * state.rows);
+      const c = Math.floor(random() * state.cols);
 
       const key = `${r}-${c}`;
 
