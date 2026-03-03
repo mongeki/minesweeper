@@ -25,7 +25,12 @@ export class GameEngine {
 
     const cell = state.board[row][col];
 
-    if (cell.isOpen || cell.isFlagged) return state;
+    if (cell.isOpen) {
+      this.chord(state, row, col);
+      return state;
+    }
+
+    if (cell.isFlagged) return state;
 
     if (state.status === GameStatus.Ready) {
       state.status = GameStatus.Playing;
@@ -145,5 +150,52 @@ export class GameEngine {
 
   private static checkWin(state: GameState): boolean {
     return state.openedCount === state.rows * state.cols - state.mines;
+  }
+
+  private static chord(state: GameState, row: number, col: number) {
+    const cell = state.board[row][col];
+
+    if (!cell.isOpen || cell.adjacentMines === 0) return;
+
+    const neighbors = this.getNeighbors(state, row, col);
+
+    const flaggedCount = neighbors.filter((n) => n.isFlagged).length;
+
+    if (flaggedCount !== cell.adjacentMines) return;
+
+    for (const neighbor of neighbors) {
+      if (!neighbor.isOpen && !neighbor.isFlagged) {
+        if (neighbor.isMine) {
+          neighbor.isOpen = true;
+          state.status = GameStatus.Lost;
+          return;
+        }
+
+        this.floodFill(state, neighbor.row, neighbor.col);
+      }
+    }
+
+    if (this.checkWin(state)) {
+      state.status = GameStatus.Won;
+    }
+  }
+
+  private static getNeighbors(state: GameState, row: number, col: number) {
+    const neighbors: Cell[] = [];
+
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+
+        const nr = row + dr;
+        const nc = col + dc;
+
+        if (state.board[nr] && state.board[nr][nc]) {
+          neighbors.push(state.board[nr][nc]);
+        }
+      }
+    }
+
+    return neighbors;
   }
 }
