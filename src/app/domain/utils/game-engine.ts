@@ -5,8 +5,6 @@ import { GameStatus } from '../enums/game-status.enum';
 export class GameEngine {
   static createGame(rows: number, cols: number, mines: number): GameState {
     const board = this.createEmptyBoard(rows, cols);
-    this.placeMines(board, mines);
-    this.calculateAdjacents(board);
 
     return {
       rows,
@@ -33,6 +31,8 @@ export class GameEngine {
     if (cell.isFlagged) return state;
 
     if (state.status === GameStatus.Ready) {
+      this.placeMines(state, row, col);
+      this.calculateNumbers(state);
       state.status = GameStatus.Playing;
     }
 
@@ -65,31 +65,71 @@ export class GameEngine {
   // ------------------------
 
   private static createEmptyBoard(rows: number, cols: number): Cell[][] {
-    return Array.from({ length: rows }, (_, r) =>
-      Array.from({ length: cols }, (_, c) => ({
-        row: r,
-        col: c,
-        isMine: false,
-        isOpen: false,
-        isFlagged: false,
-        adjacentMines: 0,
-      })),
-    );
+    const board: Cell[][] = [];
+
+    for (let r = 0; r < rows; r++) {
+      const row: Cell[] = [];
+      for (let c = 0; c < cols; c++) {
+        row.push({
+          row: r,
+          col: c,
+          isMine: false,
+          isOpen: false,
+          isFlagged: false,
+          adjacentMines: 0,
+        });
+      }
+      board.push(row);
+    }
+
+    return board;
   }
 
-  private static placeMines(board: Cell[][], mines: number) {
-    const rows = board.length;
-    const cols = board[0].length;
+  private static placeMines(state: GameState, safeRow: number, safeCol: number) {
+    const forbidden = new Set<string>();
+
+    // запрещаем саму клетку
+    forbidden.add(`${safeRow}-${safeCol}`);
+
+    // запрещаем соседей
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const r = safeRow + dr;
+        const c = safeCol + dc;
+        if (state.board[r] && state.board[r][c]) {
+          forbidden.add(`${r}-${c}`);
+        }
+      }
+    }
 
     let placed = 0;
 
-    while (placed < mines) {
-      const r = Math.floor(Math.random() * rows);
-      const c = Math.floor(Math.random() * cols);
+    while (placed < state.mines) {
+      const r = Math.floor(Math.random() * state.rows);
+      const c = Math.floor(Math.random() * state.cols);
 
-      if (!board[r][c].isMine) {
-        board[r][c].isMine = true;
+      const key = `${r}-${c}`;
+
+      if (forbidden.has(key)) continue;
+
+      const cell = state.board[r][c];
+      if (!cell.isMine) {
+        cell.isMine = true;
         placed++;
+      }
+    }
+  }
+
+  private static calculateNumbers(state: GameState) {
+    for (let r = 0; r < state.rows; r++) {
+      for (let c = 0; c < state.cols; c++) {
+        const cell = state.board[r][c];
+
+        if (cell.isMine) continue;
+
+        const neighbors = this.getNeighbors(state, r, c);
+
+        cell.adjacentMines = neighbors.filter((n) => n.isMine).length;
       }
     }
   }
