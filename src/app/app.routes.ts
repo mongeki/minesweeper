@@ -8,6 +8,11 @@ export const routes: Routes = [
     component: MainLayout,
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'game',
+      },
+      {
         path: 'game',
         loadChildren: () => import('./features/game/game.routes').then((m) => m.GAME_ROUTES),
       },
