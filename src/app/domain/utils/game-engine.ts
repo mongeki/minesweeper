@@ -1,6 +1,7 @@
 import { Cell } from '../models/cell.model';
 import { GameState } from '../models/game-state.model';
 import { GameStatus } from '../enums/game-status.enum';
+import { GameAction } from '../models/game-action';
 
 export class GameEngine {
   static createGame(
@@ -22,39 +23,65 @@ export class GameEngine {
     };
   }
 
+  static reduce(state: GameState, action: GameAction): GameState {
+    switch (action.type) {
+      case 'open':
+        return this.openCell(state, action.row, action.col);
+
+      case 'flag':
+        return this.toggleFlag(state, action.row, action.col);
+
+      case 'chord':
+        return this.openCell(state, action.row, action.col);
+
+      default:
+        return state;
+    }
+  }
+
   static openCell(state: GameState, row: number, col: number): GameState {
     if (state.status === GameStatus.Won || state.status === GameStatus.Lost) {
       return state;
     }
 
-    const cell = state.board[row][col];
+    const newBoard = this.cloneBoard(state.board);
+    let newState: GameState = { ...state, board: newBoard };
+
+    const cell = newBoard[row][col];
 
     if (cell.isOpen) {
-      this.chord(state, row, col);
+      return this.chord(newState, row, col);
+    }
+
+    if (cell.isFlagged) {
       return state;
     }
 
-    if (cell.isFlagged) return state;
-
     if (state.status === GameStatus.Ready) {
-      this.placeMines(state, row, col);
-      this.calculateNumbers(state);
-      state.status = GameStatus.Playing;
+      this.placeMines(newState, row, col);
+      this.calculateNumbers(newState);
+      newState.status = GameStatus.Playing;
     }
 
     if (cell.isMine) {
       cell.isOpen = true;
-      state.status = GameStatus.Lost;
-      return state;
+
+      return {
+        ...newState,
+        status: GameStatus.Lost,
+      };
     }
 
-    this.floodFill(state, row, col);
+    this.floodFill(newState, row, col);
 
-    if (this.checkWin(state)) {
-      state.status = GameStatus.Won;
+    if (this.checkWin(newState)) {
+      return {
+        ...newState,
+        status: GameStatus.Won,
+      };
     }
 
-    return state;
+    return newState;
   }
 
   static toggleFlag(state: GameState, row: number, col: number): GameState {
@@ -69,6 +96,10 @@ export class GameEngine {
   // ------------------------
   // PRIVATE METHODS
   // ------------------------
+
+  private static cloneBoard(board: Cell[][]): Cell[][] {
+    return board.map((row) => row.map((cell) => ({ ...cell })));
+  }
 
   private static mulberry32(seed: number) {
     return function () {
@@ -149,54 +180,29 @@ export class GameEngine {
     }
   }
 
-  private static calculateAdjacents(board: Cell[][]) {
-    const directions = [-1, 0, 1];
+  private static floodFill(state: GameState, startRow: number, startCol: number) {
+    const queue: Array<[number, number]> = [[startRow, startCol]];
 
-    for (let r = 0; r < board.length; r++) {
-      for (let c = 0; c < board[0].length; c++) {
-        if (board[r][c].isMine) continue;
-
-        let count = 0;
-
-        for (let dr of directions) {
-          for (let dc of directions) {
-            if (dr === 0 && dc === 0) continue;
-
-            const nr = r + dr;
-            const nc = c + dc;
-
-            if (board[nr] && board[nr][nc] && board[nr][nc].isMine) {
-              count++;
-            }
-          }
-        }
-
-        board[r][c].adjacentMines = count;
-      }
-    }
-  }
-
-  private static floodFill(state: GameState, row: number, col: number) {
-    const stack: [number, number][] = [[row, col]];
-
-    while (stack.length) {
-      const [r, c] = stack.pop()!;
-      const cell = state.board[r][c];
+    while (queue.length > 0) {
+      const [row, col] = queue.shift()!;
+      const cell = state.board[row][col];
 
       if (cell.isOpen || cell.isFlagged) continue;
 
       cell.isOpen = true;
       state.openedCount++;
 
-      if (cell.adjacentMines === 0) {
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            const nr = r + dr;
-            const nc = c + dc;
+      if (cell.adjacentMines > 0) continue;
 
-            if (state.board[nr] && state.board[nr][nc]) {
-              stack.push([nr, nc]);
-            }
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+
+          const r = row + dr;
+          const c = col + dc;
+
+          if (state.board[r] && state.board[r][c]) {
+            queue.push([r, c]);
           }
         }
       }
@@ -207,32 +213,46 @@ export class GameEngine {
     return state.openedCount === state.rows * state.cols - state.mines;
   }
 
-  private static chord(state: GameState, row: number, col: number) {
+  private static chord(state: GameState, row: number, col: number): GameState {
     const cell = state.board[row][col];
 
-    if (!cell.isOpen || cell.adjacentMines === 0) return;
+    if (!cell.isOpen || cell.adjacentMines === 0) {
+      return state;
+    }
 
     const neighbors = this.getNeighbors(state, row, col);
 
     const flaggedCount = neighbors.filter((n) => n.isFlagged).length;
 
-    if (flaggedCount !== cell.adjacentMines) return;
+    if (flaggedCount !== cell.adjacentMines) {
+      return state;
+    }
+
+    let newState = state;
 
     for (const neighbor of neighbors) {
-      if (!neighbor.isOpen && !neighbor.isFlagged) {
-        if (neighbor.isMine) {
-          neighbor.isOpen = true;
-          state.status = GameStatus.Lost;
-          return;
-        }
+      if (neighbor.isOpen || neighbor.isFlagged) continue;
 
-        this.floodFill(state, neighbor.row, neighbor.col);
+      if (neighbor.isMine) {
+        neighbor.isOpen = true;
+
+        return {
+          ...newState,
+          status: GameStatus.Lost,
+        };
       }
+
+      this.floodFill(newState, neighbor.row, neighbor.col);
     }
 
-    if (this.checkWin(state)) {
-      state.status = GameStatus.Won;
+    if (this.checkWin(newState)) {
+      return {
+        ...newState,
+        status: GameStatus.Won,
+      };
     }
+
+    return newState;
   }
 
   private static getNeighbors(state: GameState, row: number, col: number) {

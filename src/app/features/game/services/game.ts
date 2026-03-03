@@ -60,13 +60,23 @@ export class GameService {
   }
 
   open(row: number, col: number) {
-    const updated = GameEngine.openCell(this._state(), row, col);
-    this._state.set({ ...updated });
+    const updated = GameEngine.reduce(this._state(), {
+      type: 'open',
+      row,
+      col,
+    });
+
+    this._state.set(updated);
   }
 
   toggleFlag(row: number, col: number) {
-    const updated = GameEngine.toggleFlag(this._state(), row, col);
-    this._state.set({ ...updated });
+    const updated = GameEngine.reduce(this._state(), {
+      type: 'flag',
+      row,
+      col,
+    });
+
+    this._state.set(updated);
   }
 
   private startTimer() {
