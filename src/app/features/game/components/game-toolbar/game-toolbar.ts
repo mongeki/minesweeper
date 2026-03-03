@@ -18,8 +18,4 @@ export class GameToolbar {
   minesLeft = 10;
   time = 0;
   constructor(public game: GameService) {}
-
-  newGame() {
-    console.log('New Game');
-  }
 }
