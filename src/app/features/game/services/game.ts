@@ -54,6 +54,16 @@ export class GameService {
     this._time.set(0);
   }
 
+  autoFlag(row: number, col: number) {
+    const updated = GameEngine.reduce(this._state(), {
+      type: 'auto-flag',
+      row,
+      col,
+    });
+
+    this._state.set(updated);
+  }
+
   setDifficulty(difficulty: Difficulty) {
     this.difficulty.set(difficulty);
     this.newGame();

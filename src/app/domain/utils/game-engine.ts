@@ -31,8 +31,8 @@ export class GameEngine {
       case 'flag':
         return this.toggleFlag(state, action.row, action.col);
 
-      case 'chord':
-        return this.openCell(state, action.row, action.col);
+      case 'auto-flag':
+        return this.autoFlag(state, action.row, action.col);
 
       default:
         return state;
@@ -96,6 +96,38 @@ export class GameEngine {
   // ------------------------
   // PRIVATE METHODS
   // ------------------------
+
+  private static autoFlag(state: GameState, row: number, col: number): GameState {
+    if (state.status !== GameStatus.Playing) return state;
+
+    const newBoard = this.cloneBoard(state.board);
+    const newState: GameState = { ...state, board: newBoard };
+
+    const cell = newBoard[row][col];
+
+    if (!cell.isOpen || cell.adjacentMines === 0) {
+      return state;
+    }
+
+    const neighbors = this.getNeighbors(newState, row, col);
+
+    const flaggedCount = neighbors.filter((n) => n.isFlagged).length;
+    const closedNeighbors = neighbors.filter((n) => !n.isOpen && !n.isFlagged);
+
+    const remainingMines = cell.adjacentMines - flaggedCount;
+
+    if (remainingMines <= 0) return state;
+
+    if (closedNeighbors.length !== remainingMines) {
+      return state;
+    }
+
+    for (const neighbor of closedNeighbors) {
+      neighbor.isFlagged = true;
+    }
+
+    return newState;
+  }
 
   private static cloneBoard(board: Cell[][]): Cell[][] {
     return board.map((row) => row.map((cell) => ({ ...cell })));

@@ -1,0 +1,26 @@
+<div
+  class="cell"
+  [class.open]="cell.isOpen"
+  [class.mine]="cell.isOpen && cell.isMine"
+  [class.flagged]="cell.isFlagged"
+  [class.pressed]="pressed()"
+  (click)="onLeftClick()"
+  (contextmenu)="onRightClick($event)"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointerleave)="onPointerLeave()"
+>
+  @if (cell.isOpen && !cell.isMine && cell.adjacentMines > 0) {
+    <span [class]="numberClass">
+      {{ cell.adjacentMines }}
+    </span>
+  }
+
+  @if (cell.isOpen && cell.isMine) {
+    <span>💣</span>
+  }
+
+  @if (!cell.isOpen && cell.isFlagged) {
+    <span>🚩</span>
+  }
+</div>

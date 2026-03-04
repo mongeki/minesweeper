@@ -1,0 +1,60 @@
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #888;
+  background: #c0c0c0;
+  cursor: pointer;
+  user-select: none;
+
+  font-weight: bold;
+  font-size: 14px;
+
+  transition: background 0.1s ease;
+
+  &.pressed {
+    background: #aaa;
+  }
+
+  &.open {
+    background: #e0e0e0;
+    cursor: default;
+  }
+
+  &.mine {
+    background: #ffb3b3;
+  }
+
+  &.flagged {
+    background: #c0c0c0;
+  }
+}
+
+.mine-1 {
+  color: blue;
+}
+.mine-2 {
+  color: green;
+}
+.mine-3 {
+  color: red;
+}
+.mine-4 {
+  color: navy;
+}
+.mine-5 {
+  color: brown;
+}
+.mine-6 {
+  color: teal;
+}
+.mine-7 {
+  color: black;
+}
+.mine-8 {
+  color: gray;
+}
